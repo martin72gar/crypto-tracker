@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import site.martinspace.cryptotracker.core.presentation.util.ObserverAsEvents
 import site.martinspace.cryptotracker.core.presentation.util.toString
+import site.martinspace.cryptotracker.crypto.presentation.coin_detail.CoinDetailScreen
 import site.martinspace.cryptotracker.crypto.presentation.coin_list.CoinListEvent
 import site.martinspace.cryptotracker.crypto.presentation.coin_list.CoinListScreen
 import site.martinspace.cryptotracker.crypto.presentation.coin_list.CoinListViewModel
@@ -34,19 +35,25 @@ class MainActivity : ComponentActivity() {
                         when (event) {
                             is CoinListEvent.Error -> {
                                 Toast.makeText(
-                                    context,
-                                    event.error.toString(context),
-                                    Toast.LENGTH_LONG
-                                )
-                                    .show()
+                                    context, event.error.toString(context), Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
+                    when {
+                        state.selectedCoin != null -> {
+                            CoinDetailScreen(
+                                state = state, modifier = Modifier.padding(innerPadding)
+                            )
+                        }
 
-                    CoinListScreen(
-                        state = state,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                        else -> {
+                            CoinListScreen(
+                                state = state, modifier = Modifier.padding(innerPadding),
+                                onAction = viewModel::onAction
+                            )
+                        }
+                    }
                 }
             }
         }
