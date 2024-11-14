@@ -26,12 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import site.martinspace.cryptotracker.crypto.presentation.coin_detail.components.InfoCard
-import site.martinspace.cryptotracker.crypto.presentation.coin_list.CoinListScreen
 import site.martinspace.cryptotracker.crypto.presentation.coin_list.CoinListState
 import site.martinspace.cryptotracker.crypto.presentation.coin_list.components.previewCoin
 import site.martinspace.cryptotracker.ui.theme.CryptoTrackerTheme
@@ -102,10 +100,10 @@ fun CoinDetailScreen(
                     formattedText = "$ ${coin.priceUsd.formatted}",
                     icon = ImageVector.vectorResource(R.drawable.dollar),
                 )
-                val absouluteChangeFormatted =
+                val absoluteChangeFormatted =
                     (coin.priceUsd.value * (coin.changePercent24Hr.value / 100)).toDisplayableNumber()
-                val isPositivie = coin.changePercent24Hr.value > 0.0
-                val contentColor = if (isPositivie) {
+                val isPositive = coin.changePercent24Hr.value > 0.0
+                val contentColor = if (isPositive) {
                     if (isSystemInDarkTheme()) Color.Green else greenBackground
                 } else {
                     MaterialTheme.colorScheme.error
@@ -114,7 +112,7 @@ fun CoinDetailScreen(
                 InfoCard(
                     title = stringResource(R.string.change),
                     formattedText = "$ ${coin.changePercent24Hr.formatted}",
-                    icon = if (isPositivie) {
+                    icon = if (isPositive) {
                         ImageVector.vectorResource(R.drawable.trending)
                     } else {
                         ImageVector.vectorResource(
