@@ -1,5 +1,7 @@
 package site.martinspace.cryptotracker.crypto.presentation.coin_list
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -14,7 +16,9 @@ import kotlinx.coroutines.launch
 import site.martinspace.cryptotracker.core.domain.util.onError
 import site.martinspace.cryptotracker.core.domain.util.onSuccess
 import site.martinspace.cryptotracker.crypto.domain.CoinDataSource
+import site.martinspace.cryptotracker.crypto.presentation.models.CoinUi
 import site.martinspace.cryptotracker.crypto.presentation.models.toCoinUi
+import java.time.ZonedDateTime
 
 class CoinListViewModel(
     private val coinDataSource: CoinDataSource
@@ -31,10 +35,12 @@ class CoinListViewModel(
     private val _events = Channel<CoinListEvent>()
     val events = _events.receiveAsFlow()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onAction(action: CoinListAction) {
         when (action) {
             is CoinListAction.OnCoinClick -> {
                 _state.update { it.copy(selectedCoin = action.coinUi) }
+                selectCoin(action.coinUi)
             }
         }
     }
@@ -59,5 +65,25 @@ class CoinListViewModel(
                 }
         }
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun selectCoin(coinUi: CoinUi) {
+        _state.update { it.copy(selectedCoin = coinUi) }
+
+        viewModelScope.launch {
+            coinDataSource
+                .getCoinHistory(
+                    coinId = coinUi.id,
+                    start = ZonedDateTime.now().minusDays(5),
+                    end = ZonedDateTime.now()
+                )
+                .onSuccess { history ->
+                    println(history)
+                }
+                .onError { error ->
+                    _events.send(CoinListEvent.Error(error))
+                }
+        }
     }
 }
